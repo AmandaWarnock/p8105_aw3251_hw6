@@ -199,4 +199,39 @@ bw_df %>%
 resid_pred
 ```
 
+Residuals tend to cluster around 0 and predictions tend to cluster around 3100. 
+
+Compare to other models. 
+
+```{r}
+fit2 = lm(bwt ~ blength + gaweeks, data = bw_df)
+summary(fit2)
+
+fit2_resid_pred = 
+  bw_df %>% 
+  modelr::add_residuals(fit2) %>% 
+  modelr::add_predictions(fit2) %>% 
+  ggplot(aes(x = resid, y = pred)) + geom_point()
+
+fit2_resid_pred
+```
+
+While these resdiuals also cluster around 0 and the predictions cluster around 3000, there are some major outliers.  
+
+```{r}
+fit3 = lm(bwt ~ bhead + blength + babysex, data = bw_df)
+summary(fit3)
+
+fit3_resid_pred = 
+  bw_df  %>% 
+  modelr::add_residuals(fit3) %>% 
+  modelr::add_predictions(fit3) %>% 
+  ggplot(aes(x = resid, y = pred)) + geom_point()
+
+fit3_resid_pred
+```
+
+Overall clustering is similar, but there are also multiple major outliers. 
+
+Comparing via cross-validation.
 
