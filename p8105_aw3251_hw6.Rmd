@@ -275,3 +275,23 @@ cv_comparison
 
 The RSME for my model, RMSE1, are far higher than for the other two models. The model using head circumference, length, and sex has the lowest RSME. 
 
+## Problem 3
+
+Loading data. 
+
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+
+set.seed(1)
+```
+
