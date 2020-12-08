@@ -323,6 +323,8 @@ boot_sample(weather_df) %>%
   stat_smooth(method = "lm")
 ```
 
+Taking 5000 bootstrap samples. 
+
 ```{r}
 bootstraps = 
   data_frame(
@@ -333,5 +335,66 @@ bootstraps =
 bootstraps
 ```
 
+Cleaning the output to focus on the selected quantities and creating the log equation.
+
+```{r}
+bootstraps_output = 
+  bootstraps %>% 
+  mutate(
+    model = map(strap_sample, ~lm(tmax ~ tmin, data = .x)),
+    broomtidy = map(model, broom::tidy),
+    broomglance = map(model, broom::glance)
+  ) %>% 
+  unnest(broomtidy, broomglance) %>% 
+  select(term, estimate, r.squared) %>% 
+  pivot_wider(
+    names_from = term,
+    values_from = estimate
+  ) %>% 
+  rename(
+    B0 = '(Intercept)',
+    B1 = tmin,
+    rsq = r.squared
+  ) %>% 
+  mutate(log_eq = log(B0*B1)) %>% 
+  select(rsq, log_eq)
+
+bootstraps_output
+```
+
+Creating a plot of the log equation
+
+```{r}
+log_curve = 
+bootstraps_output %>% 
+  ggplot(aes(x = log_eq)) +
+  geom_histogram() +
+  theme_bw() +
+  labs(
+    y = "Frequency",
+    x = "log(B0*B1) Estimate"
+  )
+
+log_curve
+```
+
+The 95% CI for log(B0*B1) is [`r round(quantile(pull(bootstraps_output, log_eq), probs = c(0.025, 0.975)), digits = 2)`].
+
+Creating a plot of the R2. 
+
+```{r}
+rsq_curve  = 
+bootstraps_output %>% 
+  ggplot(aes(x = rsq)) +
+  geom_histogram() +
+  labs(
+    y = "Frequency",
+    x = "R2 Estimate"
+  )
+
+rsq_curve
+```
+
+The 95% CI for r2 is [`r round(quantile(pull(bootstraps_output, rsq), probs = c(0.025, 0.975)), digits = 2)`].
 
 
