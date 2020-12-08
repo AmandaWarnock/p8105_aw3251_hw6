@@ -149,4 +149,54 @@ fit %>%
 fit_table
 ```
 
+Exploratory analysis.
+
+```{r}
+fincome_resid = 
+bw_df %>% 
+  modelr::add_residuals(fit) %>% 
+  ggplot(aes(x =  fincome, y = resid)) + geom_violin()
+
+fincome_pred = 
+  bw_df %>% 
+  modelr::add_predictions(fit) %>% 
+  ggplot(aes(x = fincome, y  = pred)) + geom_violin()
+```
+
+```{r}
+smoken_resid = 
+bw_df %>% 
+  modelr::add_residuals(fit) %>% 
+  ggplot(aes(x = smoken, y = resid)) + geom_violin()
+
+smoken_pred = 
+  bw_df %>% 
+  modelr::add_predictions(fit) %>% 
+  ggplot(aes(x = smoken, y = pred)) + geom_violin()
+```
+
+```{r}
+momage_resid = 
+  bw_df %>% 
+  modelr::add_residuals(fit) %>% 
+  ggplot(aes(x = momage, y = resid)) + geom_violin()
+
+momage_pred = 
+  bw_df %>% 
+  modelr::add_predictions(fit) %>% 
+  ggplot(aes(x = momage, y = pred)) + geom_violin()
+```
+
+Plot of residuals. 
+
+```{r}
+resid_pred = 
+bw_df %>% 
+  modelr::add_residuals(fit) %>% 
+  modelr::add_predictions(fit)  %>% 
+  ggplot(aes(x = resid, y = pred)) + geom_point()
+
+resid_pred
+```
+
 
