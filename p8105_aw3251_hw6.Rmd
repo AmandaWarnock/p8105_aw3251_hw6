@@ -82,6 +82,71 @@ model_results_df %>%
 theme(axis.text.x = element_text(angle = 90))
 ```
 
+## Problem 2
 
+Loading data.
+
+```{r}
+bw_df =
+  read.csv("data/birthweight.csv") %>% 
+  janitor::clean_names()
+```
+
+Cleaning data.
+
+
+```{r}
+bw_df = 
+bw_df %>% 
+  mutate(
+    babysex = as.character(babysex),
+    babysex = case_when(
+      babysex == 1 ~ "Male",
+      babysex == 2 ~ "Female"),
+    frace = as.character(frace),
+    frace = case_when(
+      frace == 1 ~ "White",
+      frace == 2 ~ "Black",
+      frace == 3 ~ "Asian",
+      frace == 4 ~ "Puerto Rican",
+      frace == 8 ~ "Other",
+      frace == 9 ~ "Unknown"),
+    gaweeks = as.double(gaweeks),
+    malform = as.character(malform),
+    malform = case_when(
+      malform == 0 ~ "absent",
+      malform == 1 ~ "present"),
+    mrace = as.character(mrace),
+    mrace = case_when(
+      mrace == 1 ~ "White",
+      mrace == 2 ~ "Black",
+      mrace == 3 ~ "Asian",
+      mrace == 4 ~ "Puerto Rican",
+      mrace == 8 ~ "Other"),
+    ppbmi = as.double(ppbmi),
+    smoken = as.double(smoken)
+    )
+```
+
+Income, smoking, and the age of the mother have all been found to be associated with birthweight. Generally, it can be hypothesized that have a lower income, more cigarettes per day, and an older age may result in lower birthweight. I'm curious to look into these factors to see how much of an impact they appear to have on birthweight. 
+
+Here, I set up the linear regression and clean the output.
+
+```{r}
+fit = lm(bwt ~ fincome + smoken + momage, data = bw_df)
+summary(fit)
+
+fit_table = 
+fit %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>% 
+  mutate(
+    term = str_replace(term, "^fincome", "Family monthly income in hundreds"),
+    term = str_replace(term, "^smoken", "Av. cigarettes per day during pregnancy"),
+    term = str_replace (term, "^momage", "Age of mom at delivery")) %>% 
+  knitr::kable()
+
+fit_table
+```
 
 
