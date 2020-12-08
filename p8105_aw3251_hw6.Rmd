@@ -295,3 +295,43 @@ weather_df =
 set.seed(1)
 ```
 
+Fitting the linear model.
+
+```{r}
+fit = lm(tmax ~tmin, data = weather_df)
+summary(fit)
+
+fit_output = 
+fit %>% 
+  broom::tidy() %>% 
+  knitr::kable()
+
+fit_output 
+```
+
+Bootstrap function and plot. 
+
+```{r}
+boot_sample = function(df) {
+  sample_frac(df, replace = T) %>% 
+    arrange(tmin)
+}
+
+boot_sample(weather_df) %>% 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point() +
+  stat_smooth(method = "lm")
+```
+
+```{r}
+bootstraps = 
+  data_frame(
+    strap_number = 1:5000,
+    strap_sample = rerun(5000, boot_sample(weather_df))
+  )
+
+bootstraps
+```
+
+
+
